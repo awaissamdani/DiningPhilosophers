@@ -1,3 +1,6 @@
+/**
+ * Wrapper around integer variable with a constant telling that no one is holding the fork
+ */
 public class ForkHolder {
 
     private int holder;

@@ -1,5 +1,6 @@
+import java.util.concurrent.Callable;
 
-public class Philosopher implements Runnable {
+public class Philosopher implements Callable<Integer> {
 
     private Fork leftFork;
     private Fork rightFork;
@@ -14,28 +15,33 @@ public class Philosopher implements Runnable {
     }
 
     @Override
-    public void run() {
+    public Integer call() throws Exception {
         while (true) {
-            int processTime = (int) (Math.random() * 1000);
-            int idleTime = (int) (Math.random() * 100);
+            int eatingTime = (int) (Math.random() * 1000); // randomly chosen
+            int thinkingTime = (int) (Math.random() * 100);
 
             try {
                 status.set(PhilosopherStatus.STATUS_IDLE);
-                //Thread.sleep(idleTime); // if commented out, the deadlock is very likely to happen
+                // our philosophers eat much more than think, so the deadlock is very likely to happen
+                // Thread.sleep(idleTime);
 
                 status.set(PhilosopherStatus.STATUS_WAITING);
                 leftFork.acquireAndAcknowledge(idx);
                 rightFork.acquireAndAcknowledge(idx);
 
                 status.set(PhilosopherStatus.STATUS_EATING);
-                Thread.sleep(processTime);
+                Thread.sleep(eatingTime); // eating is represented by sleeping
 
-                leftFork.releaseAndAcknowledge();
-                rightFork.releaseAndAcknowledge();
+                leftFork.releaseAndAcknowledge(idx);
+                rightFork.releaseAndAcknowledge(idx);
+
             } catch (InterruptedException e) {
-                break; // the dinner is over
+                System.out.println("Philosopher " + idx + ": Someone has stolen my forks!");
+                leftFork.releaseAndAcknowledge(idx);
+                rightFork.releaseAndAcknowledge(idx);
+                status.set(PhilosopherStatus.STATUS_IDLE);
+                return idx;
             }
         }
     }
-
 }

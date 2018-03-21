@@ -1,3 +1,6 @@
+/**
+ * Wrapper around integer variable with constants for statuses
+ */
 public class PhilosopherStatus {
     private int status;
 
@@ -11,6 +14,10 @@ public class PhilosopherStatus {
 
     public void set(int status) {
         this.status = status;
+    }
+
+    public int get() {
+        return status;
     }
 
     @Override
